@@ -14,7 +14,7 @@ export interface UserProps {
     roles: 'admin' | 'user' | 'merchant';
     verified: boolean;
     token: number;
-    phone: number;
+    phone: string;
     updatedAt?: Date;
     createdAt?: Date;
 }
@@ -44,7 +44,7 @@ const userSchema = new mongoose.Schema<UserProps>({
         default: "user"
     },
     phone: {
-        type: Number,
+        type: String,
         trim: true
     },
 
