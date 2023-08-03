@@ -4,8 +4,11 @@ import Logger from "morgan"
 import cors from "cors"
 import "colors"
 import userRoutes from "./routes/user.routes"
+import categoryRoutes from "./routes/category/category.route"
 import connectDb from "./config/Db.connection"
 import { errorHandler, notFound } from "./middlewares/errorHandler"
+
+
 const app = express()
 app.use(cors({ credentials: true }))
 app.use(express.json())
@@ -17,11 +20,15 @@ app.get('/', (req: Request, res: Response) => {
 });
 
 
-
 // routes
 app.use("/api/users", userRoutes)
+app.use("/api/category", categoryRoutes)
+
+//custom middlewares
 app.use(notFound)
 app.use(errorHandler)
+
+// listening to port
 const PORT = process.env.PORT
 app.listen(PORT, async () => {
     console.log(`server started on localhost:${PORT}`.red)

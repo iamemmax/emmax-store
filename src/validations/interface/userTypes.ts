@@ -2,7 +2,7 @@ export interface createuserTypes {
     userId?: string;
     firstname: string;
     lastname: string;
-    phone: number;
+    phone: string;
     email: string;
     password: string;
     password2: string;

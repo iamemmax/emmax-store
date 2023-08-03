@@ -161,7 +161,7 @@ export const loginUser = AsyncHandler(async (req: Request<{}, {}, authenticateUs
             if (!compared) res.send({ msg: "something went wrong" })
             if (compared) {
                 const { userId, email, firstname, roles, lastname, createdAt, verified } = userExist
-                const token = jwt.sign({ userId, email, firstname, lastname, roles, verified }, String(process.env.JWT_PRIVATE_KEY), { algorithm: "HS256", expiresIn: "1hr" })
+                const token = jwt.sign({ userId, email, firstname, lastname, roles, verified }, String(process.env.JWT_PRIVATE_KEY), { algorithm: "HS256", expiresIn: "5hr" })
                 res.status(201).send({
                     user: {
                         userId, email, firstname, lastname, roles, token, verified, createdAt,
@@ -266,12 +266,11 @@ export const updateUser = AsyncHandler(async (req: Request<{ userId: string }, {
         const user = await userModel.findOneAndUpdate({ userId }, {
             $set: {
                 firstname: firstname || userExist?.firstname,
-                lastname: lastname || userExist?.lastname
-            },
-            $inc: {
+                lastname: lastname || userExist?.lastname,
                 phone: phone || userExist?.phone
-            }
-        }, { new: true })
+            },
+
+        }, { new: true }).select("-__v -token -_id")
         if (!user) {
             res.status(401).json({
                 res: "fail",
@@ -280,7 +279,7 @@ export const updateUser = AsyncHandler(async (req: Request<{ userId: string }, {
         } else {
             res.status(201).json({
                 res: "ok",
-                msg: "user deleted successfully",
+                msg: "user updated successfully",
                 user
             })
         }
