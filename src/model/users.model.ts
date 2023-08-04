@@ -5,7 +5,7 @@ export interface ReqUser extends UserProps {
 }
 
 // type rolesProps = 'admin' | 'user' | 'merchant'
-export interface UserProps {
+export interface UserProps extends mongoose.Document {
     userId?: string
     firstname: string;
     email: string;
