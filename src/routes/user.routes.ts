@@ -1,6 +1,6 @@
 import express from "express"
-import { ResendOtp, createUser, deleteUser, getCurrentUser, listUsers, loginUser, updateUser, verifyUser } from "../controllers/user.controller"
-import { createUserValidation, validateLoginSchema, validateToken } from "../validations/schema/users.joi";
+import { ResendOtp, createUser, deleteUser, forgetPassword, getCurrentUser, listUsers, loginUser, updateResetPassword, updateUser, verifyForgetPasswordOtp, verifyUser } from "../controllers/user.controller"
+import { createUserValidation, validateForgetPaswword, validateLoginSchema, validateResetPassword, validateToken } from "../validations/schema/users.joi";
 import { validateSchema } from '../validations/validate';
 import { isAdmin, isAuthenticated } from "../middlewares/ensureLogin";
 const router = express.Router()
@@ -13,5 +13,9 @@ router.post("/authenticate", validateSchema(validateLoginSchema), loginUser)
 router.get("/me/:userId", isAuthenticated, getCurrentUser)
 router.delete("/delete/:userId", isAuthenticated, isAdmin, deleteUser)
 router.put("/update/:userId", isAuthenticated, updateUser)
+router.get("/forgetpassword", validateSchema(validateForgetPaswword), forgetPassword)
+router.put("/verify/reset/:email", validateSchema(validateToken), verifyForgetPasswordOtp)
+router.put("/reset/update/:userId", validateSchema(validateResetPassword), updateResetPassword)
+
 
 export default router

@@ -16,6 +16,16 @@ export const validateLoginSchema = Joi.object<authenticateUserTypes>({
         .pattern(new RegExp('^[a-zA-Z0-9]{3,30}$')).required(),
 })
 export const validateToken = Joi.object<Pick<createuserTypes, "token">>({
-    token: Joi.string().required(),
+    token: Joi.number().required(),
+
+})
+export const validateResetPassword = Joi.object<Pick<createuserTypes, "password" | "password2">>({
+    password: Joi.string()
+        .pattern(new RegExp('^[a-zA-Z0-9]{3,30}$')),
+    password2: Joi.ref('password')
+
+})
+export const validateForgetPaswword = Joi.object<authenticateUserTypes>({
+    email: Joi.string().email().required(),
 
 })
