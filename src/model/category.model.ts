@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 import { v4 as uuidv4 } from "uuid"
-export interface CategoryProps {
+export interface CategoryProps extends mongoose.Document {
     name: string;
     categoryId: string;
     updatedAt?: Date;
