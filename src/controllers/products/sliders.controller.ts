@@ -51,7 +51,7 @@ export const getSliderList = AsyncHandler(async (req: Request, res: Response) =>
 })
 
 
-// @DESC:get single category
+// @DESC:get single product
 //@METHOD:GET
 //@ROUTES:localhost:3001/api/products/slider/:productId
 
@@ -82,7 +82,7 @@ export const getSingleSlider = AsyncHandler(async (req: Request<{ productId: str
 
 // @DESC: update product slider
 //@METHOD:Put
-//@ROUTES:localhost:3001/api/category/:userId
+//@ROUTES:localhost:3001/api/category/:productId
 export const updateCategory = AsyncHandler(async (req: Request<{ productId: string }, {}, productSliderProps>, res: Response) => {
     let { productId } = req.params
     const { category, img, title, postedBy } = req.body
