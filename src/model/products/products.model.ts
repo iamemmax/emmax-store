@@ -21,6 +21,7 @@ export interface productsProps {
     category: Types.ObjectId;
     productImgs: imgPros[];
     size: string[];
+    colors: string[];
     price: number;
     quantity: number;
     sold: number;
@@ -66,6 +67,10 @@ const productSchema = new mongoose.Schema<productsProps>({
         trim: true,
     },
     size: {
+        type: [],
+        required: true
+    },
+    colors: {
         type: [],
         required: true
     },

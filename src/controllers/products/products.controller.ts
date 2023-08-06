@@ -8,14 +8,14 @@ import AsyncHandler from 'express-async-handler';
 //@METHOD:post
 //@ROUTES:localhost:3001/api/products/craete
 export const createProduct = async (req: Request<{}, {}, productsProps>, res: Response) => {
-    const { brand, title, category, description, price, productImgs, quantity, userId, size } = req.body
+    const { brand, title, category, description, price, productImgs, quantity, userId, size, colors } = req.body
     try {
         const productExit = await productModel.findOne<productsProps>({ title })
         if (productExit) {
             return res.status(401).json({ msg: `product already exist` })
         }
         const product: HydratedDocument<productsProps> = await new productModel({
-            title, category, description, price, size, productImgs, brand, quantity, userId
+            title, category, description, price, size, colors, productImgs, brand, quantity, userId
         }).save()
         if (product) {
             return res.status(201).json({
@@ -178,7 +178,7 @@ export const deleteProduct = AsyncHandler(async (req: Request<productsProps>, re
 //@ROUTES:localhost:3001/api/products/update/:productId
 export const updateProduct = AsyncHandler(async (req: Request<{ productId: string }, {}, productsProps>, res: Response) => {
     let { productId } = req.params
-    const { category, title, brand, description, price, productImgs, quantity, size, userId, sold } = req.body
+    const { category, title, brand, description, price, productImgs, quantity, size, colors, userId, sold } = req.body
     try {
         const product = await productModel.findOne<productsProps>({ productId })
         if (!product) {
@@ -194,6 +194,7 @@ export const updateProduct = AsyncHandler(async (req: Request<{ productId: strin
                 category: category || product?.category,
                 userId: userId || product?.userId,
                 size: size || product?.size,
+                colors: colors || product?.colors,
                 brand: brand || product?.brand,
                 description: description || product?.description,
                 price: price || product?.price,

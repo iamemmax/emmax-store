@@ -2,7 +2,7 @@ const asyncHandler = require("express-async-handler");
 const jwt = require("jsonwebtoken");
 import { NextFunction, Request, Response } from "express";
 import { JwtPayload, JsonWebTokenError } from "jsonwebtoken";
-import userModel, { UserProps } from "../model/users.model";
+import userModel, { UserProps, rolesProps } from "../model/users.model";
 
 
 export const isAuthenticated = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
@@ -46,12 +46,12 @@ export const isAuthenticated = asyncHandler(async (req: Request, res: Response, 
     }
 })
 
-export const isAdmin = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
+export const isAdmin = (roles: any) => asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
     //@ts-ignore
     const userId = req.user.userId
     try {
         const users = await userModel.findOne<UserProps>({ userId })
-        if (users?.roles !== "admin") {
+        if (users?.roles.includes(roles)) {
             return res.status(403).json({
                 res: "fail",
                 msg: "Access Denied"

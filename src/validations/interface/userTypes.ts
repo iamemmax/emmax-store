@@ -1,5 +1,6 @@
 export interface createuserTypes {
     userId?: string;
+    username: string;
     firstname: string;
     lastname: string;
     phone: string;

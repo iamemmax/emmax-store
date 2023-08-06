@@ -17,16 +17,16 @@ import { sendMail } from "../helpers/sendMail";
 //@ROUTES:localhost:3001/api/users/create
 
 export const createUser = async (req: Request<{}, {}, createuserTypes>, res: Response) => {
-    const { firstname, lastname, email, password } = req.body
+    const { username, email, password } = req.body
     try {
         const userExist = await userModel.findOne({ email })
         if (userExist) {
             return res.send({ msg: "email already exist" })
         }
-        const genUserId = `userId_${firstname}${email.slice(0, 5)}${Math.floor(Math.random() * (99999 - 10000 + 1)) + 10000}${password.slice(0, 4)}${password.slice(0, 3)}`
+        const genUserId = `userId_${username}${email.slice(0, 5)}${Math.floor(Math.random() * (99999 - 10000 + 1)) + 10000}${password.slice(0, 4)}${password.slice(0, 3)}`
         const { hash } = await hashPassword(password)
         const data: HydratedDocument<UserProps> = await new userModel({
-            userId: genUserId, firstname, lastname, email, password: hash, token: Math.floor(Math.random() * (99999 - 10000 + 1)) + 10000
+            userId: genUserId, username, email, password: hash, token: Math.floor(Math.random() * (99999 - 10000 + 1)) + 10000
         }).save()
         if (data) {
             sendMail(
@@ -42,7 +42,7 @@ export const createUser = async (req: Request<{}, {}, createuserTypes>, res: Res
                 </html>
                 `
             );
-            res.send({ user: { userId: data?.userId, firstname, lastname, email, msg: "Registration is successful. A verification OTP has been sent to your email." } })
+            res.send({ user: { userId: data?.userId, username, email, msg: "Registration is successful. A verification OTP has been sent to your email." } })
         }
     } catch (error: any) {
         res.status(401);
@@ -306,7 +306,7 @@ export const forgetPassword = AsyncHandler(async (req: Request<{}, {}, Pick<crea
             );
             res.status(201).json({
                 res: "ok",
-                msg: "verification code has been sent to" + email,
+                msg: "verification code has been sent to " + email,
                 user
             })
         }

@@ -4,14 +4,15 @@ export interface ReqUser extends UserProps {
     user: any // or any other type
 }
 
-// type rolesProps = 'admin' | 'user' | 'merchant'
+export type rolesProps = ['admin' | 'user' | 'merchant']
 export interface UserProps extends mongoose.Document {
     userId?: string
     firstname: string;
     email: string;
+    username: string;
     lastname?: string;
     password: string;
-    roles: 'admin' | 'user' | 'merchant';
+    roles: rolesProps;
     verified: boolean;
     token: number;
     phone: string;
@@ -23,14 +24,17 @@ const userSchema = new mongoose.Schema<UserProps>({
         type: String,
         // default: () => `userId_${uuidv4()}`
     },
-    firstname: {
+    username: {
         type: String,
         required: true,
         trim: true
     },
+    firstname: {
+        type: String,
+        trim: true
+    },
     lastname: {
         type: String,
-        required: true,
         trim: true
     },
     email: {
@@ -40,8 +44,8 @@ const userSchema = new mongoose.Schema<UserProps>({
         trim: true,
     },
     roles: {
-        type: String,
-        default: "user"
+        type: [],
+        default: ["user"]
     },
     phone: {
         type: String,
