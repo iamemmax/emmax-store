@@ -6,7 +6,7 @@
   "author": "Emmatech",
   "scripts": {
     "start": "node ./dist/server.js",
-    "build": "npx tsc -p .",
+    "build": "tsc --project tsconfig.json",
     "dev": "nodemon ./src/server.ts"
   },
   "dependencies": {

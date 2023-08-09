@@ -12,9 +12,30 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getUser = void 0;
-const users_model_1 = __importDefault(require("../model/users.model"));
-const getUser = (query, option = { lean: true }) => __awaiter(void 0, void 0, void 0, function* () {
-    return yield users_model_1.default.findOne(query).select("-password");
+exports.sendMail = void 0;
+const nodemailer_1 = __importDefault(require("nodemailer"));
+const sendMail = (email, subject, html) => __awaiter(void 0, void 0, void 0, function* () {
+    let transporter = yield nodemailer_1.default.createTransport({
+        service: 'gmail',
+        auth: {
+            user: process.env.EMAIL,
+            pass: process.env.PASSWORD
+        }
+    });
+    var mailOptions = {
+        from: `emmax-store "no-reply@emmax-store.com"`,
+        replyTo: 'no-reply@emmax-store.com',
+        to: email,
+        subject: subject,
+        html: html
+    };
+    yield transporter.sendMail(mailOptions, function (error, info) {
+        if (error) {
+            console.log(error);
+        }
+        else {
+            console.log('Email sent: ' + info.response);
+        }
+    });
 });
-exports.getUser = getUser;
+exports.sendMail = sendMail;
