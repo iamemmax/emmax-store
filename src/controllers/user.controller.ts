@@ -20,8 +20,12 @@ export const createUser = async (req: Request<{}, {}, createuserTypes>, res: Res
     const { username, email, password } = req.body
     try {
         const userExist = await userModel.findOne({ email })
+        const userUsernameExist = await userModel.findOne({ username })
         if (userExist) {
-            return res.send({ msg: "email already exist" })
+            return res.send({ res: "fail", msg: "email already exist" })
+        }
+        if (userUsernameExist) {
+            return res.send({ res: "fail", msg: "username already exist" })
         }
         const genUserId = `userId_${username}${email.slice(0, 5)}${Math.floor(Math.random() * (99999 - 10000 + 1)) + 10000}${password.slice(0, 4)}${password.slice(0, 3)}`
         const { hash } = await hashPassword(password)
@@ -42,7 +46,7 @@ export const createUser = async (req: Request<{}, {}, createuserTypes>, res: Res
                 </html>
                 `
             );
-            res.send({ user: { userId: data?.userId, username, email, msg: "Registration is successful. A verification OTP has been sent to your email." } })
+            res.send({ user: { res: "ok", userId: data?.userId, username, email, msg: "Registration is successful. A verification OTP has been sent to your email." } })
         }
     } catch (error: any) {
         res.status(401);

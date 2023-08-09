@@ -32,9 +32,11 @@ app.use(errorHandler)
 
 // listening to port
 const PORT = process.env.PORT
-app.listen(PORT, async () => {
-    console.log(`server started on localhost:${PORT}`.red)
-    await connectDb()
+connectDb().then((res: any) => {
+    app.listen(PORT, async () => {
+        console.log(`server started on localhost:${PORT}`.red)
 
+
+    })
 
 })
