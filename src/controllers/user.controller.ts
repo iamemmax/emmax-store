@@ -90,7 +90,7 @@ export const ResendOtp = async (req: Request<{ userId: string }>, res: Response)
                 </html>
                 `
             );
-            res.send({ msg: "A verification OTP has been resent to your email." })
+            res.send({ res: "ok", msg: "A verification OTP has been resent to your email." })
             // console.log(cryptoRandomString({ length: 10, type: "numeric" }));
 
         }
@@ -116,7 +116,7 @@ export const verifyUser = AsyncHandler(async (req: Request<{ userId: string }, {
         if (!user) {
             res.status(403).json({
                 res: "fail",
-                status: "no user found",
+                msg: "no user found",
             })
         } else {
             if (user?.token === Number(token)) {
@@ -125,13 +125,13 @@ export const verifyUser = AsyncHandler(async (req: Request<{ userId: string }, {
                 if (verifyUser) {
                     res.status(201).json({
                         res: "success",
-                        status: "user verified",
+                        msg: "user verified",
                     })
                 }
             } else {
                 res.status(403).json({
                     res: "fail",
-                    status: "Incorrect or expired token",
+                    msg: "Incorrect or expired token",
                 })
             }
         }
@@ -154,18 +154,19 @@ export const loginUser = AsyncHandler(async (req: Request<{}, {}, authenticateUs
 
         if (userExist?.verified === true) {
             const compared = await bcrypt.compareSync(password, userExist.password)
-            if (!compared) { res.send({ msg: "email or password not correct" }) }
+            if (!compared) { res.send({ res: "fail", msg: "email or password not correct" }) }
             if (compared) {
                 const { userId, email, firstname, roles, lastname, createdAt, verified } = userExist
                 const token = jwt.sign({ userId, email, firstname, lastname, roles, verified }, String(process.env.JWT_PRIVATE_KEY), { algorithm: "HS256", expiresIn: "5hr" })
                 res.status(201).send({
                     user: {
                         userId, email, firstname, lastname, roles, token, verified, createdAt,
-                    }
+                    },
+                    msg: "Authentication successful"
                 })
             }
         } else {
-            res.send({ msg: "email or password not correct" })
+            res.send({ res: "fail", msg: "email or password not correct" })
         }
     } catch (error: any) {
         res.status(405).json({ msg: error.message })

@@ -83,7 +83,7 @@ const ResendOtp = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
                 </head>
                 </html>
                 `);
-            res.send({ msg: "A verification OTP has been resent to your email." });
+            res.send({ res: "ok", msg: "A verification OTP has been resent to your email." });
             // console.log(cryptoRandomString({ length: 10, type: "numeric" }));
         }
     }
@@ -104,7 +104,7 @@ exports.verifyUser = (0, express_async_handler_1.default)((req, res) => __awaite
         if (!user) {
             res.status(403).json({
                 res: "fail",
-                status: "no user found",
+                msg: "no user found",
             });
         }
         else {
@@ -113,14 +113,14 @@ exports.verifyUser = (0, express_async_handler_1.default)((req, res) => __awaite
                 if (verifyUser) {
                     res.status(201).json({
                         res: "success",
-                        status: "user verified",
+                        msg: "user verified",
                     });
                 }
             }
             else {
                 res.status(403).json({
                     res: "fail",
-                    status: "Incorrect or expired token",
+                    msg: "Incorrect or expired token",
                 });
             }
         }
@@ -140,7 +140,7 @@ exports.loginUser = (0, express_async_handler_1.default)((req, res) => __awaiter
         if ((userExist === null || userExist === void 0 ? void 0 : userExist.verified) === true) {
             const compared = yield bcrypt_1.default.compareSync(password, userExist.password);
             if (!compared) {
-                res.send({ msg: "email or password not correct" });
+                res.send({ res: "fail", msg: "email or password not correct" });
             }
             if (compared) {
                 const { userId, email, firstname, roles, lastname, createdAt, verified } = userExist;
@@ -148,12 +148,13 @@ exports.loginUser = (0, express_async_handler_1.default)((req, res) => __awaiter
                 res.status(201).send({
                     user: {
                         userId, email, firstname, lastname, roles, token, verified, createdAt,
-                    }
+                    },
+                    msg: "Authentication successful"
                 });
             }
         }
         else {
-            res.send({ msg: "email or password not correct" });
+            res.send({ res: "fail", msg: "email or password not correct" });
         }
     }
     catch (error) {
