@@ -61,17 +61,20 @@ export const createUser = (AsyncHandler(async (req: Request<{}, {}, createuserTy
 //@METHOD:put
 //@ROUTES:localhost:3001/api/users/resendotp/userid
 
-export const ResendOtp = async (req: Request<{ userId: string }>, res: Response) => {
+export const ResendOtp = (AsyncHandler(async (req: Request<{ userId: string }>, res: Response) => {
     const { userId } = req.params
     try {
         const userExist = await userModel.findOne<UserProps>({ userId })
 
         if (!userExist) {
-            return res.status(401).json({ msg: "user not found" })
+            // return res.status(401).json({ msg: "user not found" })
+            res.status(400);
+            throw new Error("user not found");
         }
 
         if (userExist.verified === true) {
-            return res.status(401).json({ msg: "Account already verified" })
+            res.status(401);
+            throw new Error("Account already verified");
         }
 
         const updateOtp = await userModel.findOneAndUpdate({ userId }, { $set: { token: Math.floor(Math.random() * (99999 - 10000 + 1)) + 10000 } }, { new: true })
@@ -102,7 +105,7 @@ export const ResendOtp = async (req: Request<{ userId: string }>, res: Response)
         throw new Error(error.message);
     }
 
-}
+}))
 
 
 
@@ -153,7 +156,10 @@ export const loginUser = AsyncHandler(async (req: Request<{}, {}, authenticateUs
 
         if (userExist?.verified === true) {
             const compared = await bcrypt.compareSync(password, userExist.password)
-            if (!compared) { res.send({ res: "fail", msg: "email or password not correct" }) }
+            if (!compared) {
+                res.status(400);
+                throw new Error("email or password not correct");
+            }
             if (compared) {
                 const { userId, email, firstname, roles, lastname, createdAt, verified } = userExist
                 const token = jwt.sign({ userId, email, firstname, lastname, roles, verified }, String(process.env.JWT_PRIVATE_KEY), { algorithm: "HS256", expiresIn: "5hr" })
@@ -165,7 +171,8 @@ export const loginUser = AsyncHandler(async (req: Request<{}, {}, authenticateUs
                 })
             }
         } else {
-            res.send({ res: "fail", msg: "email or password not correct" })
+            res.status(400);
+            throw new Error("email or password not correct");
         }
     } catch (error: any) {
         res.status(405).json({ msg: error.message })
@@ -185,18 +192,23 @@ export const getCurrentUser = AsyncHandler(async (req: Request, res: Response) =
     // @ts-ignore
     console.log(req.user);
 
-    const user = await getUser({ userId })
-    // const user = await userModel.findById(userId)
-    if (!user) {
-        res.status(403).json({
-            res: "fail",
-            status: "no user found",
+    try {
+        const user = await getUser({ userId })
+        // const user = await userModel.findById(userId)
+        if (!user) {
+            res.status(400)
+            throw new Error("user not found");
+        }
+        res.status(201).json({
+            res: "ok",
+            user
         })
+
+
+    } catch (error: any) {
+        res.status(401)
+        throw new Error(error.message);
     }
-    res.status(201).json({
-        res: "ok",
-        user
-    })
 })
 
 
@@ -214,7 +226,8 @@ export const listUsers = AsyncHandler(async (req: Request, res: Response) => {
             users
         })
     } catch (error: any) {
-        res.status(405).json({ msg: error.message })
+        res.status(401)
+        throw new Error(error.message);
     }
 })
 
@@ -235,7 +248,8 @@ export const deleteUser = AsyncHandler(async (req: Request, res: Response) => {
             user
         })
     } catch (error: any) {
-        res.status(405).json({ msg: error.message })
+        res.status(401)
+        throw new Error(error.message);
     }
 })
 
@@ -251,10 +265,8 @@ export const updateUser = AsyncHandler(async (req: Request<{ userId: string }, {
     try {
         const userExist = await userModel.findOne<UserProps>({ userId })
         if (!userExist) {
-            res.status(401).json({
-                res: "fail",
-                msg: "user not found"
-            })
+            res.status(401)
+            throw new Error("user not found");
         }
         const user = await userModel.findOneAndUpdate({ userId }, {
             $set: {
@@ -265,10 +277,8 @@ export const updateUser = AsyncHandler(async (req: Request<{ userId: string }, {
 
         }, { new: true }).select("-__v -token -_id")
         if (!user) {
-            res.status(401).json({
-                res: "fail",
-                msg: "unable to update user"
-            })
+            res.status(401)
+            throw new Error("unable to update user");
         } else {
             res.status(201).json({
                 res: "ok",
@@ -277,7 +287,8 @@ export const updateUser = AsyncHandler(async (req: Request<{ userId: string }, {
             })
         }
     } catch (error: any) {
-        res.status(405).json({ msg: error.message })
+        res.status(401)
+        throw new Error(error.message);
     }
 })
 
@@ -291,7 +302,10 @@ export const forgetPassword = AsyncHandler(async (req: Request<{}, {}, Pick<crea
     const { email } = req.body
     try {
         const userExist = await userModel.findOne({ email })
-        if (userExist?.verified === false) res.send({ msg: "unverify account" })
+        if (userExist?.verified === false) {
+            res.status(400);
+            throw new Error("unverify account");
+        }
         // if (!userExist) res.send({ msg: "account not found" })
         const user = await userModel.findOneAndUpdate<createuserTypes>({ email }, { $set: { token: Math.floor(Math.random() * (99999 - 10000 + 1)) + 10000 } }, { new: true })
         if (user) {
@@ -328,10 +342,9 @@ export const verifyForgetPasswordOtp = AsyncHandler(async (req: Request<Pick<cre
     try {
         const user = await userModel.findOne<UserProps>({ email })
         if (!user) {
-            res.status(403).json({
-                res: "fail",
-                status: "no user found",
-            })
+            res.status(400)
+            throw new Error("no user found");
+
         } else {
             if (user?.token === Number(token)) {
                 const verifyUser = await userModel.findOneAndUpdate({ email }, { $set: { verified: true, token: "" } },
@@ -343,10 +356,8 @@ export const verifyForgetPasswordOtp = AsyncHandler(async (req: Request<Pick<cre
                     })
                 }
             } else {
-                res.status(403).json({
-                    res: "fail",
-                    status: "Incorrect or expired token",
-                })
+                res.status(400)
+                throw new Error("Incorrect or expired token");
             }
         }
     } catch (error: any) {
@@ -366,16 +377,12 @@ export const updateResetPassword = AsyncHandler(async (req: Request<Pick<createu
     try {
         const userExist = await userModel.findOne<createuserTypes>({ userId })
         if (!userExist) {
-            res.status(403).json({
-                res: "fail",
-                status: "no user found",
-            })
+            res.status(400)
+            throw new Error("user not found");
         }
         if (userExist?.verified === true) {
             const { hash } = await hashPassword(password)
-            console.log('====================================');
-            console.log(password, hash);
-            console.log('====================================');
+
             const update = await userModel.findOneAndUpdate({ userId }, { $set: { password: hash } }, { new: true })
             if (update) {
                 res.status(201).json({

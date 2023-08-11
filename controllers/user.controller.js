@@ -62,15 +62,18 @@ exports.createUser = ((0, express_async_handler_1.default)((req, res) => __await
 //@DESC:resent otp
 //@METHOD:put
 //@ROUTES:localhost:3001/api/users/resendotp/userid
-const ResendOtp = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+exports.ResendOtp = ((0, express_async_handler_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { userId } = req.params;
     try {
         const userExist = yield users_model_1.default.findOne({ userId });
         if (!userExist) {
-            return res.status(401).json({ msg: "user not found" });
+            // return res.status(401).json({ msg: "user not found" })
+            res.status(400);
+            throw new Error("user not found");
         }
         if (userExist.verified === true) {
-            return res.status(401).json({ msg: "Account already verified" });
+            res.status(401);
+            throw new Error("Account already verified");
         }
         const updateOtp = yield users_model_1.default.findOneAndUpdate({ userId }, { $set: { token: Math.floor(Math.random() * (99999 - 10000 + 1)) + 10000 } }, { new: true });
         if (updateOtp) {
@@ -92,8 +95,7 @@ const ResendOtp = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         res.status(401);
         throw new Error(error.message);
     }
-});
-exports.ResendOtp = ResendOtp;
+})));
 // @DESC:verify user
 //@METHOD:PUT
 //@ROUTES:localhost:3001/api/users/verify/:userid
@@ -137,7 +139,8 @@ exports.loginUser = (0, express_async_handler_1.default)((req, res) => __awaiter
         if ((userExist === null || userExist === void 0 ? void 0 : userExist.verified) === true) {
             const compared = yield bcrypt_1.default.compareSync(password, userExist.password);
             if (!compared) {
-                res.send({ res: "fail", msg: "email or password not correct" });
+                res.status(400);
+                throw new Error("email or password not correct");
             }
             if (compared) {
                 const { userId, email, firstname, roles, lastname, createdAt, verified } = userExist;
@@ -151,7 +154,8 @@ exports.loginUser = (0, express_async_handler_1.default)((req, res) => __awaiter
             }
         }
         else {
-            res.send({ res: "fail", msg: "email or password not correct" });
+            res.status(400);
+            throw new Error("email or password not correct");
         }
     }
     catch (error) {
@@ -168,18 +172,22 @@ exports.getCurrentUser = (0, express_async_handler_1.default)((req, res) => __aw
     }
     // @ts-ignore
     console.log(req.user);
-    const user = yield (0, User_service_1.getUser)({ userId });
-    // const user = await userModel.findById(userId)
-    if (!user) {
-        res.status(403).json({
-            res: "fail",
-            status: "no user found",
+    try {
+        const user = yield (0, User_service_1.getUser)({ userId });
+        // const user = await userModel.findById(userId)
+        if (!user) {
+            res.status(400);
+            throw new Error("user not found");
+        }
+        res.status(201).json({
+            res: "ok",
+            user
         });
     }
-    res.status(201).json({
-        res: "ok",
-        user
-    });
+    catch (error) {
+        res.status(401);
+        throw new Error(error.message);
+    }
 }));
 // @DESC:get all users list
 //@METHOD:GET
@@ -195,7 +203,8 @@ exports.listUsers = (0, express_async_handler_1.default)((req, res) => __awaiter
         });
     }
     catch (error) {
-        res.status(405).json({ msg: error.message });
+        res.status(401);
+        throw new Error(error.message);
     }
 }));
 // @DESC:delete a particular user 
@@ -214,7 +223,8 @@ exports.deleteUser = (0, express_async_handler_1.default)((req, res) => __awaite
         });
     }
     catch (error) {
-        res.status(405).json({ msg: error.message });
+        res.status(401);
+        throw new Error(error.message);
     }
 }));
 // @DESC:update a particular user 
@@ -227,10 +237,8 @@ exports.updateUser = (0, express_async_handler_1.default)((req, res) => __awaite
     try {
         const userExist = yield users_model_1.default.findOne({ userId });
         if (!userExist) {
-            res.status(401).json({
-                res: "fail",
-                msg: "user not found"
-            });
+            res.status(401);
+            throw new Error("user not found");
         }
         const user = yield users_model_1.default.findOneAndUpdate({ userId }, {
             $set: {
@@ -240,10 +248,8 @@ exports.updateUser = (0, express_async_handler_1.default)((req, res) => __awaite
             },
         }, { new: true }).select("-__v -token -_id");
         if (!user) {
-            res.status(401).json({
-                res: "fail",
-                msg: "unable to update user"
-            });
+            res.status(401);
+            throw new Error("unable to update user");
         }
         else {
             res.status(201).json({
@@ -254,7 +260,8 @@ exports.updateUser = (0, express_async_handler_1.default)((req, res) => __awaite
         }
     }
     catch (error) {
-        res.status(405).json({ msg: error.message });
+        res.status(401);
+        throw new Error(error.message);
     }
 }));
 // @DESC:forget password
@@ -265,8 +272,10 @@ exports.forgetPassword = (0, express_async_handler_1.default)((req, res) => __aw
     const { email } = req.body;
     try {
         const userExist = yield users_model_1.default.findOne({ email });
-        if ((userExist === null || userExist === void 0 ? void 0 : userExist.verified) === false)
-            res.send({ msg: "unverify account" });
+        if ((userExist === null || userExist === void 0 ? void 0 : userExist.verified) === false) {
+            res.status(400);
+            throw new Error("unverify account");
+        }
         // if (!userExist) res.send({ msg: "account not found" })
         const user = yield users_model_1.default.findOneAndUpdate({ email }, { $set: { token: Math.floor(Math.random() * (99999 - 10000 + 1)) + 10000 } }, { new: true });
         if (user) {
@@ -297,10 +306,8 @@ exports.verifyForgetPasswordOtp = (0, express_async_handler_1.default)((req, res
     try {
         const user = yield users_model_1.default.findOne({ email });
         if (!user) {
-            res.status(403).json({
-                res: "fail",
-                status: "no user found",
-            });
+            res.status(400);
+            throw new Error("no user found");
         }
         else {
             if ((user === null || user === void 0 ? void 0 : user.token) === Number(token)) {
@@ -313,10 +320,8 @@ exports.verifyForgetPasswordOtp = (0, express_async_handler_1.default)((req, res
                 }
             }
             else {
-                res.status(403).json({
-                    res: "fail",
-                    status: "Incorrect or expired token",
-                });
+                res.status(400);
+                throw new Error("Incorrect or expired token");
             }
         }
     }
@@ -335,16 +340,11 @@ exports.updateResetPassword = (0, express_async_handler_1.default)((req, res) =>
     try {
         const userExist = yield users_model_1.default.findOne({ userId });
         if (!userExist) {
-            res.status(403).json({
-                res: "fail",
-                status: "no user found",
-            });
+            res.status(400);
+            throw new Error("user not found");
         }
         if ((userExist === null || userExist === void 0 ? void 0 : userExist.verified) === true) {
             const { hash } = yield (0, bcrypt_2.hashPassword)(password);
-            console.log('====================================');
-            console.log(password, hash);
-            console.log('====================================');
             const update = yield users_model_1.default.findOneAndUpdate({ userId }, { $set: { password: hash } }, { new: true });
             if (update) {
                 res.status(201).json({
