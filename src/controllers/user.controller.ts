@@ -135,7 +135,7 @@ export const verifyUser = AsyncHandler(async (req: Request<{ userId: string }, {
             }
         }
     } catch (error: any) {
-        res.status(500);
+        res.status(401);
         throw new Error(error.message);
     }
 })

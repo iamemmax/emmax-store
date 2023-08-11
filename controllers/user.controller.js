@@ -123,7 +123,7 @@ exports.verifyUser = (0, express_async_handler_1.default)((req, res) => __awaite
         }
     }
     catch (error) {
-        res.status(500);
+        res.status(401);
         throw new Error(error.message);
     }
 }));
