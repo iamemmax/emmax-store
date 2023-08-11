@@ -159,7 +159,8 @@ exports.loginUser = (0, express_async_handler_1.default)((req, res) => __awaiter
         }
     }
     catch (error) {
-        res.status(405).json({ msg: error.message });
+        res.status(401);
+        throw new Error(error.message);
     }
 }));
 // @DESC:get current user

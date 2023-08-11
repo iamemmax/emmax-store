@@ -175,7 +175,8 @@ export const loginUser = AsyncHandler(async (req: Request<{}, {}, authenticateUs
             throw new Error("email or password not correct");
         }
     } catch (error: any) {
-        res.status(405).json({ msg: error.message })
+        res.status(401);
+        throw new Error(error.message);
     }
 
 })
