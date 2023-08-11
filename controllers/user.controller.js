@@ -29,10 +29,10 @@ const createUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
         const userExist = yield users_model_1.default.findOne({ email });
         const userUsernameExist = yield users_model_1.default.findOne({ username });
         if (userExist) {
-            return res.send({ res: "fail", msg: "email already exist" });
+            return res.status(401).json({ res: "fail", msg: "email already exist" });
         }
         if (userUsernameExist) {
-            return res.send({ res: "fail", msg: "username already exist" });
+            return res.status(404).json({ res: "fail", msg: "username already exist" });
         }
         const genUserId = `userId_${username}${email.slice(0, 5)}${Math.floor(Math.random() * (99999 - 10000 + 1)) + 10000}${password.slice(0, 4)}${password.slice(0, 3)}`;
         const { hash } = yield (0, bcrypt_2.hashPassword)(password);
@@ -49,7 +49,7 @@ const createUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
                 </head>
                 </html>
                 `);
-            res.send({ user: { res: "ok", userId: data === null || data === void 0 ? void 0 : data.userId, username, email, msg: "Registration is successful. A verification OTP has been sent to your email." } });
+            res.status(201).json({ user: { res: "ok", userId: data === null || data === void 0 ? void 0 : data.userId, username, email, msg: "Registration is successful. A verification OTP has been sent to your email." } });
         }
     }
     catch (error) {
@@ -66,10 +66,10 @@ const ResendOtp = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const userExist = yield users_model_1.default.findOne({ userId });
         if (!userExist) {
-            return res.send({ msg: "user not found" });
+            return res.status(401).json({ msg: "user not found" });
         }
         if (userExist.verified === true) {
-            return res.send({ msg: "Account already verified" });
+            return res.status(401).json({ msg: "Account already verified" });
         }
         const updateOtp = yield users_model_1.default.findOneAndUpdate({ userId }, { $set: { token: Math.floor(Math.random() * (99999 - 10000 + 1)) + 10000 } }, { new: true });
         if (updateOtp) {
@@ -83,7 +83,7 @@ const ResendOtp = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
                 </head>
                 </html>
                 `);
-            res.send({ res: "ok", msg: "A verification OTP has been resent to your email." });
+            res.status(201).json({ res: "ok", msg: "A verification OTP has been resent to your email." });
             // console.log(cryptoRandomString({ length: 10, type: "numeric" }));
         }
     }
@@ -102,7 +102,7 @@ exports.verifyUser = (0, express_async_handler_1.default)((req, res) => __awaite
     try {
         const user = yield users_model_1.default.findOne({ userId });
         if (!user) {
-            res.send({
+            res.status(401).json({
                 res: "fail",
                 msg: "no user found",
             });
@@ -118,7 +118,7 @@ exports.verifyUser = (0, express_async_handler_1.default)((req, res) => __awaite
                 }
             }
             else {
-                res.send({
+                res.status(402).json({
                     res: "fail",
                     msg: "Incorrect or expired token",
                 });

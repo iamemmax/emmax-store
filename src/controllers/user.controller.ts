@@ -22,10 +22,10 @@ export const createUser = async (req: Request<{}, {}, createuserTypes>, res: Res
         const userExist = await userModel.findOne({ email })
         const userUsernameExist = await userModel.findOne({ username })
         if (userExist) {
-            return res.send({ res: "fail", msg: "email already exist" })
+            return res.status(401).json({ res: "fail", msg: "email already exist" })
         }
         if (userUsernameExist) {
-            return res.send({ res: "fail", msg: "username already exist" })
+            return res.status(404).json({ res: "fail", msg: "username already exist" })
         }
         const genUserId = `userId_${username}${email.slice(0, 5)}${Math.floor(Math.random() * (99999 - 10000 + 1)) + 10000}${password.slice(0, 4)}${password.slice(0, 3)}`
         const { hash } = await hashPassword(password)
@@ -46,7 +46,7 @@ export const createUser = async (req: Request<{}, {}, createuserTypes>, res: Res
                 </html>
                 `
             );
-            res.send({ user: { res: "ok", userId: data?.userId, username, email, msg: "Registration is successful. A verification OTP has been sent to your email." } })
+            res.status(201).json({ user: { res: "ok", userId: data?.userId, username, email, msg: "Registration is successful. A verification OTP has been sent to your email." } })
         }
     } catch (error: any) {
         res.status(401);
@@ -65,11 +65,11 @@ export const ResendOtp = async (req: Request<{ userId: string }>, res: Response)
         const userExist = await userModel.findOne<UserProps>({ userId })
 
         if (!userExist) {
-            return res.send({ msg: "user not found" })
+            return res.status(401).json({ msg: "user not found" })
         }
 
         if (userExist.verified === true) {
-            return res.send({ msg: "Account already verified" })
+            return res.status(401).json({ msg: "Account already verified" })
         }
 
         const updateOtp = await userModel.findOneAndUpdate({ userId }, { $set: { token: Math.floor(Math.random() * (99999 - 10000 + 1)) + 10000 } }, { new: true })
@@ -90,7 +90,7 @@ export const ResendOtp = async (req: Request<{ userId: string }>, res: Response)
                 </html>
                 `
             );
-            res.send({ res: "ok", msg: "A verification OTP has been resent to your email." })
+            res.status(201).json({ res: "ok", msg: "A verification OTP has been resent to your email." })
             // console.log(cryptoRandomString({ length: 10, type: "numeric" }));
 
         }
@@ -114,7 +114,7 @@ export const verifyUser = AsyncHandler(async (req: Request<{ userId: string }, {
     try {
         const user = await userModel.findOne<UserProps>({ userId })
         if (!user) {
-            res.send({
+            res.status(401).json({
                 res: "fail",
                 msg: "no user found",
             })
@@ -129,7 +129,7 @@ export const verifyUser = AsyncHandler(async (req: Request<{ userId: string }, {
                     })
                 }
             } else {
-                res.send({
+                res.status(402).json({
                     res: "fail",
                     msg: "Incorrect or expired token",
                 })
