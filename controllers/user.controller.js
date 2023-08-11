@@ -102,7 +102,7 @@ exports.verifyUser = (0, express_async_handler_1.default)((req, res) => __awaite
     try {
         const user = yield users_model_1.default.findOne({ userId });
         if (!user) {
-            res.status(403).json({
+            res.status(401).json({
                 res: "fail",
                 msg: "no user found",
             });
@@ -118,7 +118,7 @@ exports.verifyUser = (0, express_async_handler_1.default)((req, res) => __awaite
                 }
             }
             else {
-                res.status(403).json({
+                res.status(401).json({
                     res: "fail",
                     msg: "Incorrect or expired token",
                 });
