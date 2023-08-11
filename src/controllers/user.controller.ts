@@ -116,10 +116,8 @@ export const verifyUser = AsyncHandler(async (req: Request<{ userId: string }, {
     try {
         const user = await userModel.findOne<UserProps>({ userId })
         if (!user) {
-            res.status(401).json({
-                res: "fail",
-                msg: "no user found",
-            })
+            res.status(400);
+            throw new Error("user not found");
         } else {
             if (user?.token === Number(token)) {
                 const verifyUser = await userModel.findOneAndUpdate({ userId: userId }, { $set: { verified: true, token: "" } },
@@ -131,10 +129,9 @@ export const verifyUser = AsyncHandler(async (req: Request<{ userId: string }, {
                     })
                 }
             } else {
-                res.status(402).json({
-                    res: "fail",
-                    msg: "Incorrect or expired token",
-                })
+                res.status(401);
+                throw new Error("Incorrect or expired token");
+
             }
         }
     } catch (error: any) {

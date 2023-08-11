@@ -103,10 +103,8 @@ exports.verifyUser = (0, express_async_handler_1.default)((req, res) => __awaite
     try {
         const user = yield users_model_1.default.findOne({ userId });
         if (!user) {
-            res.status(401).json({
-                res: "fail",
-                msg: "no user found",
-            });
+            res.status(400);
+            throw new Error("user not found");
         }
         else {
             if ((user === null || user === void 0 ? void 0 : user.token) === Number(token)) {
@@ -119,10 +117,8 @@ exports.verifyUser = (0, express_async_handler_1.default)((req, res) => __awaite
                 }
             }
             else {
-                res.status(402).json({
-                    res: "fail",
-                    msg: "Incorrect or expired token",
-                });
+                res.status(401);
+                throw new Error("Incorrect or expired token");
             }
         }
     }
