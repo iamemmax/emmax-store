@@ -16,16 +16,16 @@ import { sendMail } from "../helpers/sendMail";
 //@METHOD:Post
 //@ROUTES:localhost:3001/api/users/create
 
-export const createUser = (AsyncHandler(async (req: Request<{}, {}, createuserTypes>, res: Response) => {
+export const createUser = async (req: Request<{}, {}, createuserTypes>, res: Response) => {
     const { username, email, password } = req.body
     try {
         const userExist = await userModel.findOne({ email })
         const userUsernameExist = await userModel.findOne({ username })
         if (userExist) {
-            res.status(401).json({ res: "fail", msg: "email already exist" })
+            return res.status(401).json({ res: "fail", msg: "email already exist" })
         }
         if (userUsernameExist) {
-            res.status(404).json({ res: "fail", msg: "username already exist" })
+            return res.status(404).json({ res: "fail", msg: "username already exist" })
         }
         const genUserId = `userId_${username}${email.slice(0, 5)}${Math.floor(Math.random() * (99999 - 10000 + 1)) + 10000}${password.slice(0, 4)}${password.slice(0, 3)}`
         const { hash } = await hashPassword(password)
@@ -53,7 +53,7 @@ export const createUser = (AsyncHandler(async (req: Request<{}, {}, createuserTy
         throw new Error(error.message);
     }
 
-}))
+}
 
 //@DESC:resent otp
 //@METHOD:put

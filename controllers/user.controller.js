@@ -23,16 +23,16 @@ const sendMail_1 = require("../helpers/sendMail");
 // @DESC:signup a user
 //@METHOD:Post
 //@ROUTES:localhost:3001/api/users/create
-exports.createUser = ((0, express_async_handler_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+const createUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { username, email, password } = req.body;
     try {
         const userExist = yield users_model_1.default.findOne({ email });
         const userUsernameExist = yield users_model_1.default.findOne({ username });
         if (userExist) {
-            res.status(401).json({ res: "fail", msg: "email already exist" });
+            return res.status(401).json({ res: "fail", msg: "email already exist" });
         }
         if (userUsernameExist) {
-            res.status(404).json({ res: "fail", msg: "username already exist" });
+            return res.status(404).json({ res: "fail", msg: "username already exist" });
         }
         const genUserId = `userId_${username}${email.slice(0, 5)}${Math.floor(Math.random() * (99999 - 10000 + 1)) + 10000}${password.slice(0, 4)}${password.slice(0, 3)}`;
         const { hash } = yield (0, bcrypt_2.hashPassword)(password);
@@ -56,7 +56,8 @@ exports.createUser = ((0, express_async_handler_1.default)((req, res) => __await
         res.status(401);
         throw new Error(error.message);
     }
-})));
+});
+exports.createUser = createUser;
 //@DESC:resent otp
 //@METHOD:put
 //@ROUTES:localhost:3001/api/users/resendotp/userid
