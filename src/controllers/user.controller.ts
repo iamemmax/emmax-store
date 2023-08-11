@@ -114,7 +114,7 @@ export const verifyUser = AsyncHandler(async (req: Request<{ userId: string }, {
     try {
         const user = await userModel.findOne<UserProps>({ userId })
         if (!user) {
-            res.status(401).json({
+            res.send({
                 res: "fail",
                 msg: "no user found",
             })
@@ -129,7 +129,7 @@ export const verifyUser = AsyncHandler(async (req: Request<{ userId: string }, {
                     })
                 }
             } else {
-                res.status(401).json({
+                res.send({
                     res: "fail",
                     msg: "Incorrect or expired token",
                 })
