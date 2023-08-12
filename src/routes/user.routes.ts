@@ -13,7 +13,7 @@ router.post("/authenticate", validateSchema(validateLoginSchema), loginUser)
 router.get("/me/:userId", isAuthenticated, getCurrentUser)
 router.delete("/delete/:userId", isAuthenticated, isAdmin(["admin"]), deleteUser)
 router.put("/update/:userId", isAuthenticated, isAdmin(["admin"]), updateUser)
-router.get("/forgetpassword", validateSchema(validateForgetPaswword), forgetPassword)
+router.get("/forgetpassword/:email", validateSchema(validateForgetPaswword), forgetPassword)
 router.put("/verify/reset/:email", validateSchema(validateToken), verifyForgetPasswordOtp)
 router.put("/reset/update/:userId", validateSchema(validateResetPassword), updateResetPassword)
 

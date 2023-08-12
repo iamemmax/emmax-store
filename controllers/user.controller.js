@@ -270,7 +270,7 @@ exports.updateUser = (0, express_async_handler_1.default)((req, res) => __awaite
 //@ROUTES:localhost:3001/api/users/forgetPassword
 //@ROLES:user
 exports.forgetPassword = (0, express_async_handler_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const { email } = req.body;
+    const { email } = req.params;
     try {
         const userExist = yield users_model_1.default.findOne({ email });
         if ((userExist === null || userExist === void 0 ? void 0 : userExist.verified) === false) {

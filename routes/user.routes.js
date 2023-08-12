@@ -17,7 +17,7 @@ router.post("/authenticate", (0, validate_1.validateSchema)(users_joi_1.validate
 router.get("/me/:userId", ensureLogin_1.isAuthenticated, user_controller_1.getCurrentUser);
 router.delete("/delete/:userId", ensureLogin_1.isAuthenticated, (0, ensureLogin_1.isAdmin)(["admin"]), user_controller_1.deleteUser);
 router.put("/update/:userId", ensureLogin_1.isAuthenticated, (0, ensureLogin_1.isAdmin)(["admin"]), user_controller_1.updateUser);
-router.get("/forgetpassword", (0, validate_1.validateSchema)(users_joi_1.validateForgetPaswword), user_controller_1.forgetPassword);
+router.get("/forgetpassword/:email", (0, validate_1.validateSchema)(users_joi_1.validateForgetPaswword), user_controller_1.forgetPassword);
 router.put("/verify/reset/:email", (0, validate_1.validateSchema)(users_joi_1.validateToken), user_controller_1.verifyForgetPasswordOtp);
 router.put("/reset/update/:userId", (0, validate_1.validateSchema)(users_joi_1.validateResetPassword), user_controller_1.updateResetPassword);
 exports.default = router;

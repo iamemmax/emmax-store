@@ -299,8 +299,8 @@ export const updateUser = AsyncHandler(async (req: Request<{ userId: string }, {
 //@ROUTES:localhost:3001/api/users/forgetPassword
 //@ROLES:user
 
-export const forgetPassword = AsyncHandler(async (req: Request<{}, {}, Pick<createuserTypes, "email" | "verified">>, res: Response) => {
-    const { email } = req.body
+export const forgetPassword = AsyncHandler(async (req: Request<{ email: string }, {}, Pick<createuserTypes, "email" | "verified">>, res: Response) => {
+    const { email } = req.params
     try {
         const userExist = await userModel.findOne({ email })
         if (userExist?.verified === false) {
