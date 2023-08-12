@@ -277,6 +277,10 @@ exports.forgetPassword = (0, express_async_handler_1.default)((req, res) => __aw
             res.status(400);
             throw new Error("unverify account");
         }
+        if (!userExist) {
+            res.status(400);
+            throw new Error("account not found");
+        }
         // if (!userExist) res.send({ msg: "account not found" })
         const user = yield users_model_1.default.findOneAndUpdate({ email }, { $set: { token: Math.floor(Math.random() * (99999 - 10000 + 1)) + 10000 } }, { new: true });
         if (user) {

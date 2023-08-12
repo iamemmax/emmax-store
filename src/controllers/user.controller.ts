@@ -303,9 +303,14 @@ export const forgetPassword = AsyncHandler(async (req: Request<{ email: string }
     const { email } = req.params
     try {
         const userExist = await userModel.findOne({ email })
+
         if (userExist?.verified === false) {
             res.status(400);
             throw new Error("unverify account");
+        }
+        if (!userExist) {
+            res.status(400);
+            throw new Error("account not found");
         }
         // if (!userExist) res.send({ msg: "account not found" })
         const user = await userModel.findOneAndUpdate<createuserTypes>({ email }, { $set: { token: Math.floor(Math.random() * (99999 - 10000 + 1)) + 10000 } }, { new: true })
