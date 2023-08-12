@@ -51,7 +51,10 @@ exports.createUser = ((0, express_async_handler_1.default)((req, res) => __await
                 </head>
                 </html>
                 `);
-            res.status(201).json({ user: { res: "ok", userId: data === null || data === void 0 ? void 0 : data.userId, username, email, msg: "Registration is successful. A verification OTP has been sent to your email." } });
+            res.status(201).json({
+                user: { res: "ok", userId: data === null || data === void 0 ? void 0 : data.userId, username, email },
+                msg: "Registration is successful. A verification OTP has been sent to your email."
+            });
         }
     }
     catch (error) {
@@ -87,7 +90,7 @@ exports.ResendOtp = ((0, express_async_handler_1.default)((req, res) => __awaite
                 </head>
                 </html>
                 `);
-            res.status(201).json({ res: "ok", msg: "A verification OTP has been resent to your email." });
+            res.status(201).json({ user: { res: "ok" }, msg: "A verification OTP has been resent to your email." });
             // console.log(cryptoRandomString({ length: 10, type: "numeric" }));
         }
     }
@@ -113,7 +116,7 @@ exports.verifyUser = (0, express_async_handler_1.default)((req, res) => __awaite
                 const verifyUser = yield users_model_1.default.findOneAndUpdate({ userId: userId }, { $set: { verified: true, token: "" } }, { new: true });
                 if (verifyUser) {
                     res.status(201).json({
-                        res: "success",
+                        user: { res: "success" },
                         msg: "user verified",
                     });
                 }
@@ -182,7 +185,8 @@ exports.getCurrentUser = (0, express_async_handler_1.default)((req, res) => __aw
         }
         res.status(201).json({
             res: "ok",
-            user
+            user,
+            msg: "success"
         });
     }
     catch (error) {
@@ -354,8 +358,8 @@ exports.updateResetPassword = (0, express_async_handler_1.default)((req, res) =>
             if (update) {
                 res.status(201).json({
                     res: "ok",
-                    status: "password change successfully",
-                    update
+                    msg: "password change successfully",
+                    user: update
                 });
             }
         }

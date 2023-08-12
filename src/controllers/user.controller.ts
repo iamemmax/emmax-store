@@ -48,7 +48,11 @@ export const createUser = (AsyncHandler(async (req: Request<{}, {}, createuserTy
                 </html>
                 `
             );
-            res.status(201).json({ user: { res: "ok", userId: data?.userId, username, email, msg: "Registration is successful. A verification OTP has been sent to your email." } })
+            res.status(201).json({
+                user: { res: "ok", userId: data?.userId, username, email }
+                , msg: "Registration is successful. A verification OTP has been sent to your email."
+            }
+            )
         }
     } catch (error: any) {
         res.status(401);
@@ -95,7 +99,7 @@ export const ResendOtp = (AsyncHandler(async (req: Request<{ userId: string }>, 
                 </html>
                 `
             );
-            res.status(201).json({ res: "ok", msg: "A verification OTP has been resent to your email." })
+            res.status(201).json({ user: { res: "ok" }, msg: "A verification OTP has been resent to your email." })
             // console.log(cryptoRandomString({ length: 10, type: "numeric" }));
 
         }
@@ -127,7 +131,7 @@ export const verifyUser = AsyncHandler(async (req: Request<{ userId: string }, {
                     { new: true })
                 if (verifyUser) {
                     res.status(201).json({
-                        res: "success",
+                        user: { res: "success" },
                         msg: "user verified",
                     })
                 }
@@ -202,7 +206,8 @@ export const getCurrentUser = AsyncHandler(async (req: Request, res: Response) =
         }
         res.status(201).json({
             res: "ok",
-            user
+            user,
+            msg: "success"
         })
 
 
@@ -393,8 +398,8 @@ export const updateResetPassword = AsyncHandler(async (req: Request<Pick<createu
             if (update) {
                 res.status(201).json({
                     res: "ok",
-                    status: "password change successfully",
-                    update
+                    msg: "password change successfully",
+                    user: update
                 })
             }
         }
