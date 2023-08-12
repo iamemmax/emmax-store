@@ -359,11 +359,12 @@ export const verifyForgetPasswordOtp = AsyncHandler(async (req: Request<Pick<cre
         } else {
             if (user?.token === Number(token)) {
                 const verifyUser = await userModel.findOneAndUpdate({ email }, { $set: { verified: true, token: "" } },
-                    { new: true })
+                    { new: true }).select("-password -__v")
                 if (verifyUser) {
                     res.status(201).json({
                         res: "success",
-                        status: "user verified",
+                        msg: "user verified",
+                        user: verifyUser
                     })
                 }
             } else {

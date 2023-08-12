@@ -320,11 +320,12 @@ exports.verifyForgetPasswordOtp = (0, express_async_handler_1.default)((req, res
         }
         else {
             if ((user === null || user === void 0 ? void 0 : user.token) === Number(token)) {
-                const verifyUser = yield users_model_1.default.findOneAndUpdate({ email }, { $set: { verified: true, token: "" } }, { new: true });
+                const verifyUser = yield users_model_1.default.findOneAndUpdate({ email }, { $set: { verified: true, token: "" } }, { new: true }).select("-password -__v");
                 if (verifyUser) {
                     res.status(201).json({
                         res: "success",
-                        status: "user verified",
+                        msg: "user verified",
+                        user: verifyUser
                     });
                 }
             }
