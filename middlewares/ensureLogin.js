@@ -17,44 +17,62 @@ const asyncHandler = require("express-async-handler");
 const jwt = require("jsonwebtoken");
 const users_model_1 = __importDefault(require("../model/users.model"));
 exports.isAuthenticated = asyncHandler((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
-    const { authorization } = req.headers;
-    const rawToken = authorization === null || authorization === void 0 ? void 0 : authorization.split(" ");
-    try {
-        jwt.verify(rawToken && rawToken[1], process.env.JWT_PRIVATE_KEY, (error, data) => {
-            if (error) {
-                res.status(400);
-                throw new Error("Invalid token");
-            }
-            if ((data === null || data === void 0 ? void 0 : data.verified) === false) {
+    var _a;
+    // const { authorization } = req.headers;
+    let token;
+    // const rawToken = authorization?.split(" ");
+    // jwt.verify(rawToken && rawToken[1], process.env.JWT_PRIVATE_KEY, (error: JsonWebTokenError, data: UserProps) => {
+    //     if (error) {
+    //         res.status(400)
+    //         throw new Error("Invalid token")
+    //     }
+    //     if (data?.verified === false) {
+    //         return res.status(403).json({
+    //             res: "failed",
+    //             message: "Your account is not verified, Check your email for verification link.",
+    //         })
+    //     }
+    //     //@ts-ignore
+    //     req.user = data
+    //     return next();
+    // });
+    //@ts-ignore
+    token = req.cookies.eAuth;
+    if (token) {
+        try {
+            const decoded = yield jwt.verify(token, process.env.JWT_PRIVATE_KEY);
+            req.user = yield users_model_1.default.findById(decoded.userId).select("-password");
+            if (((_a = req.user) === null || _a === void 0 ? void 0 : _a.verified) === false) {
                 return res.status(403).json({
                     res: "failed",
                     message: "Your account is not verified, Check your email for verification link.",
                 });
             }
-            //@ts-ignore
-            req.user = data;
-            // console.log(data.user);
-            return next();
-        });
-        //@ts-ignore
-    }
-    catch (error) {
-        if (error) {
-            res.status(401);
-            throw new Error('Not authorized');
+            next();
+            // console.log(req.user, "user");
+        }
+        catch (error) {
+            if (error) {
+                res.status(401);
+                throw new Error('Not authorized, invalid token');
+            }
         }
     }
-    if (!rawToken) {
+    else {
         res.status(401);
         throw new Error('Not authorized, no token');
     }
+    // if (!rawToken) {
+    //     res.status(401)
+    //     throw new Error('Not authorized, no token')
+    // }
 }));
 const isAdmin = (roles) => asyncHandler((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
-    //@ts-ignore
-    const userId = req.user.userId;
+    var _b;
+    const userId = (_b = req === null || req === void 0 ? void 0 : req.user) === null || _b === void 0 ? void 0 : _b.userId;
     try {
         const users = yield users_model_1.default.findOne({ userId });
-        if (users === null || users === void 0 ? void 0 : users.roles.includes(roles)) {
+        if (!(users === null || users === void 0 ? void 0 : users.roles.includes(roles))) {
             return res.status(403).json({
                 res: "fail",
                 msg: "Access Denied"

@@ -1,4 +1,27 @@
 "use strict";
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -12,14 +35,14 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.updateResetPassword = exports.verifyForgetPasswordOtp = exports.forgetPassword = exports.updateUser = exports.deleteUser = exports.listUsers = exports.getCurrentUser = exports.loginUser = exports.verifyUser = exports.ResendOtp = exports.createUser = void 0;
+exports.updateResetPassword = exports.verifyForgetPasswordOtp = exports.forgetPassword = exports.updateUser = exports.deleteUser = exports.listUsers = exports.getCurrentUser = exports.logoutUser = exports.loginUser = exports.verifyUser = exports.ResendOtp = exports.createUser = void 0;
 const users_model_1 = __importDefault(require("../model/users.model"));
-const bcrypt_1 = __importDefault(require("bcrypt"));
+const bcrypt_1 = __importStar(require("bcrypt"));
 const express_async_handler_1 = __importDefault(require("express-async-handler"));
-const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const bcrypt_2 = require("../helpers/bcrypt");
 const User_service_1 = require("../service/User.service");
 const sendMail_1 = require("../helpers/sendMail");
+const generateToken_1 = __importDefault(require("../helpers/generateToken"));
 // @DESC:signup a user
 //@METHOD:Post
 //@ROUTES:localhost:3001/api/users/create
@@ -138,19 +161,21 @@ exports.verifyUser = (0, express_async_handler_1.default)((req, res) => __awaite
 exports.loginUser = (0, express_async_handler_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     let { email, password } = req.body;
     try {
-        const userExist = yield users_model_1.default.findOne({ email }).select("-_id -__v ");
+        const userExist = yield users_model_1.default.findOne({ email }).select(" -__v ");
         if ((userExist === null || userExist === void 0 ? void 0 : userExist.verified) === true) {
             const compared = yield bcrypt_1.default.compareSync(password, userExist.password);
             if (!compared) {
                 res.status(400);
                 throw new Error("email or password not correct");
             }
+            console.log(bcrypt_1.compare);
             if (compared) {
                 const { userId, email, firstname, roles, lastname, createdAt, verified } = userExist;
-                const token = jsonwebtoken_1.default.sign({ userId, email, firstname, lastname, roles, verified }, String(process.env.JWT_PRIVATE_KEY), { algorithm: "HS256", expiresIn: "5hr" });
+                // const token = jwt.sign({ userId, email, firstname, lastname, roles, verified }, String(process.env.JWT_PRIVATE_KEY), { algorithm: "HS256", expiresIn: "5hr" })
+                const token = yield (0, generateToken_1.default)(res, userExist._id);
                 res.status(201).send({
                     user: {
-                        userId, email, firstname, lastname, roles, token, verified, createdAt,
+                        userId, email, firstname, lastname, roles, verified, createdAt,
                     },
                     msg: "Authentication successful"
                 });
@@ -158,8 +183,21 @@ exports.loginUser = (0, express_async_handler_1.default)((req, res) => __awaiter
         }
         else {
             res.status(400);
-            throw new Error("email or password not correct");
+            throw new Error("no or unverified account");
         }
+    }
+    catch (error) {
+        res.status(401);
+        throw new Error(error.message);
+    }
+}));
+exports.logoutUser = (0, express_async_handler_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        res.cookie('eAuth', '', {
+            httpOnly: true,
+            expires: new Date(0),
+        });
+        res.status(200).json({ message: 'Logged out successfully' });
     }
     catch (error) {
         res.status(401);

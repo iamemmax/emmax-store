@@ -22,11 +22,13 @@ const category_route_1 = __importDefault(require("./routes/category/category.rou
 const products_route_1 = __importDefault(require("./routes/products/products.route"));
 const Db_connection_1 = __importDefault(require("./config/Db.connection"));
 const errorHandler_1 = require("./middlewares/errorHandler");
+const cookie_parser_1 = __importDefault(require("cookie-parser"));
 const app = (0, express_1.default)();
 app.use((0, cors_1.default)({ credentials: true }));
 app.use(express_1.default.json());
-app.use(express_1.default.urlencoded({ extended: false }));
+app.use(express_1.default.urlencoded({ extended: true }));
 app.use((0, morgan_1.default)("dev"));
+app.use((0, cookie_parser_1.default)());
 app.get('/', (req, res) => {
     res.send('Hello, p Express');
 });

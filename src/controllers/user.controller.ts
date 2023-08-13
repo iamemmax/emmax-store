@@ -2,13 +2,14 @@ import { Request, Response } from "express";
 import { HydratedDocument } from "mongoose";
 import userModel, { UserProps } from "../model/users.model";
 import { authenticateUserTypes, createuserTypes } from '../validations/interface/userTypes';
-import bcrypt from "bcrypt"
+import bcrypt, { compare } from "bcrypt"
 import AsyncHandler from "express-async-handler";
 import jwt from "jsonwebtoken";
 import { hashPassword, verifyPassword } from "../helpers/bcrypt";
 import { getUser } from "../service/User.service";
 import { v4 as uuidv4 } from "uuid"
 import { sendMail } from "../helpers/sendMail";
+import generateToken from "../helpers/generateToken";
 
 
 
@@ -156,7 +157,7 @@ export const verifyUser = AsyncHandler(async (req: Request<{ userId: string }, {
 export const loginUser = AsyncHandler(async (req: Request<{}, {}, authenticateUserTypes>, res: Response) => {
     let { email, password } = req.body
     try {
-        const userExist = await userModel.findOne<UserProps>({ email }).select("-_id -__v ")
+        const userExist = await userModel.findOne<UserProps>({ email }).select(" -__v ")
 
         if (userExist?.verified === true) {
             const compared = await bcrypt.compareSync(password, userExist.password)
@@ -164,25 +165,41 @@ export const loginUser = AsyncHandler(async (req: Request<{}, {}, authenticateUs
                 res.status(400);
                 throw new Error("email or password not correct");
             }
+            console.log(compare);
+
             if (compared) {
                 const { userId, email, firstname, roles, lastname, createdAt, verified } = userExist
-                const token = jwt.sign({ userId, email, firstname, lastname, roles, verified }, String(process.env.JWT_PRIVATE_KEY), { algorithm: "HS256", expiresIn: "5hr" })
+                // const token = jwt.sign({ userId, email, firstname, lastname, roles, verified }, String(process.env.JWT_PRIVATE_KEY), { algorithm: "HS256", expiresIn: "5hr" })
+
+                const token = await generateToken(res, userExist._id)
                 res.status(201).send({
                     user: {
-                        userId, email, firstname, lastname, roles, token, verified, createdAt,
+                        userId, email, firstname, lastname, roles, verified, createdAt,
                     },
                     msg: "Authentication successful"
                 })
             }
         } else {
             res.status(400);
-            throw new Error("email or password not correct");
+            throw new Error("no or unverified account");
         }
     } catch (error: any) {
         res.status(401);
         throw new Error(error.message);
     }
 
+})
+export const logoutUser = AsyncHandler(async (req: Request, res: Response) => {
+    try {
+        res.cookie('eAuth', '', {
+            httpOnly: true,
+            expires: new Date(0),
+        });
+        res.status(200).json({ message: 'Logged out successfully' });
+    } catch (error: any) {
+        res.status(401);
+        throw new Error(error.message);
+    }
 })
 
 // @DESC:get current user
@@ -224,6 +241,7 @@ export const getCurrentUser = AsyncHandler(async (req: Request, res: Response) =
 //@ROLES:admin
 
 export const listUsers = AsyncHandler(async (req: Request, res: Response) => {
+
     try {
         const users = await userModel.find().select("-__v -password")
         res.status(201).json({

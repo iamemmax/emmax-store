@@ -11,6 +11,7 @@ const ensureLogin_1 = require("../middlewares/ensureLogin");
 const router = express_1.default.Router();
 router.get("/", ensureLogin_1.isAuthenticated, (0, ensureLogin_1.isAdmin)(["admin"]), user_controller_1.listUsers);
 router.post("/create", (0, validate_1.validateSchema)(users_joi_1.createUserValidation), user_controller_1.createUser);
+router.get("/logout", ensureLogin_1.isAuthenticated, user_controller_1.logoutUser);
 router.put("/verify/:userId", (0, validate_1.validateSchema)(users_joi_1.validateToken), user_controller_1.verifyUser);
 router.put("/resend-otp/:userId", user_controller_1.ResendOtp);
 router.post("/authenticate", (0, validate_1.validateSchema)(users_joi_1.validateLoginSchema), user_controller_1.loginUser);

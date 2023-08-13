@@ -8,14 +8,14 @@ import categoryRoutes from "./routes/category/category.route";
 import productRoutes from "./routes/products/products.route"
 import connectDb from "./config/Db.connection"
 import { errorHandler, notFound } from "./middlewares/errorHandler"
-
+import cookieParser from "cookie-parser"
 
 const app = express()
 app.use(cors({ credentials: true }))
 app.use(express.json())
-app.use(express.urlencoded({ extended: false }))
+app.use(express.urlencoded({ extended: true }))
 app.use(Logger("dev"))
-
+app.use(cookieParser());
 app.get('/', (req: Request, res: Response) => {
     res.send('Hello, p Express');
 });
