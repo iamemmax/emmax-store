@@ -168,13 +168,11 @@ export const loginUser = AsyncHandler(async (req: Request<{}, {}, authenticateUs
             console.log(compare);
 
             if (compared) {
-                const { userId, email, firstname, roles, lastname, createdAt, verified } = userExist
-                // const token = jwt.sign({ userId, email, firstname, lastname, roles, verified }, String(process.env.JWT_PRIVATE_KEY), { algorithm: "HS256", expiresIn: "5hr" })
-
+                const { userId, email, firstname, roles, username, lastname, createdAt, verified } = userExist
                 const token = await generateToken(res, userExist._id)
                 res.status(201).send({
                     user: {
-                        userId, email, firstname, lastname, roles, verified, createdAt,
+                        userId, email, firstname, username, lastname, roles, verified, createdAt,
                     },
                     msg: "Authentication successful"
                 })

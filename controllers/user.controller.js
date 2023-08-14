@@ -170,12 +170,11 @@ exports.loginUser = (0, express_async_handler_1.default)((req, res) => __awaiter
             }
             console.log(bcrypt_1.compare);
             if (compared) {
-                const { userId, email, firstname, roles, lastname, createdAt, verified } = userExist;
-                // const token = jwt.sign({ userId, email, firstname, lastname, roles, verified }, String(process.env.JWT_PRIVATE_KEY), { algorithm: "HS256", expiresIn: "5hr" })
+                const { userId, email, firstname, roles, username, lastname, createdAt, verified } = userExist;
                 const token = yield (0, generateToken_1.default)(res, userExist._id);
                 res.status(201).send({
                     user: {
-                        userId, email, firstname, lastname, roles, verified, createdAt,
+                        userId, email, firstname, username, lastname, roles, verified, createdAt,
                     },
                     msg: "Authentication successful"
                 });
