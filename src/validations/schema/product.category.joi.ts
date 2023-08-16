@@ -21,7 +21,7 @@ export const validateProduct = Joi.object<productsProps>({
     brand: Joi.string(),
     category: Joi.required(),
     userId: Joi.required(),
-    productImgs: Joi.string().required(),
+    productImgs: Joi.required(),
     price: Joi.number().required(),
     quantity: Joi.number().required(),
     size: Joi.array<string>().required(),

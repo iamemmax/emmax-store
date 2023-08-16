@@ -20,7 +20,7 @@ exports.validateProduct = joi_1.default.object({
     brand: joi_1.default.string(),
     category: joi_1.default.required(),
     userId: joi_1.default.required(),
-    productImgs: joi_1.default.string().required(),
+    productImgs: joi_1.default.required(),
     price: joi_1.default.number().required(),
     quantity: joi_1.default.number().required(),
     size: joi_1.default.array().required(),
