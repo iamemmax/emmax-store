@@ -3,9 +3,7 @@ import { v4 as uuidv4 } from "uuid"
 import slugify from "slugify"
 
 
-interface imgPros {
-    img: string
-}
+
 export interface productReviewProps {
     userId: Types.ObjectId;
     review: number
@@ -19,7 +17,7 @@ export interface productsProps {
     brand: string;
     description: string;
     category: Types.ObjectId;
-    productImgs: imgPros[];
+    productImgs: string[];
     size: string[];
     colors: string[];
     price: number;
