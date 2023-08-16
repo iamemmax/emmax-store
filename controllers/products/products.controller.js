@@ -73,14 +73,13 @@ exports.getSingleProduct = (0, express_async_handler_1.default)((req, res) => __
     try {
         let { slug } = req.params;
         if (!slug) {
+            res.status(400);
             throw new Error("product slug is required");
         }
-        const product = yield products_model_1.default.findOne({ slug }).populate("userId category", "-password -__v -token").select("-__v");
+        const product = yield products_model_1.default.findOne({ slug }).populate("userId category", "-password -__v -token").select("-__v -password").populate({ path: "productReviews.userId", select: "-password -token -verified -roles -__v" });
         if (!product) {
-            res.status(401).json({
-                res: "fail",
-                status: "no product found",
-            });
+            res.status(400);
+            throw new Error("no product found");
         }
         res.status(201).json({
             res: "ok",
@@ -88,7 +87,8 @@ exports.getSingleProduct = (0, express_async_handler_1.default)((req, res) => __
         });
     }
     catch (error) {
-        res.status(501).json({ msg: error.message });
+        res.status(400);
+        throw new Error(error.message);
     }
 }));
 // @DESC:list all related products

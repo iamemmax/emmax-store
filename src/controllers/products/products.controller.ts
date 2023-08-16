@@ -62,21 +62,22 @@ export const getSingleProduct = AsyncHandler(async (req: Request<{ slug: string 
     try {
         let { slug } = req.params
         if (!slug) {
+            res.status(400)
             throw new Error("product slug is required")
         }
-        const product = await productModel.findOne({ slug }).populate("userId category", "-password -__v -token").select("-__v")
+        const product = await productModel.findOne({ slug }).populate("userId category", "-password -__v -token",).select("-__v -password").populate({ path: "productReviews.userId", select: "-password -token -verified -roles -__v" })
+
         if (!product) {
-            res.status(401).json({
-                res: "fail",
-                status: "no product found",
-            })
+            res.status(400)
+            throw new Error("no product found")
         }
         res.status(201).json({
             res: "ok",
             product
         })
     } catch (error: any) {
-        res.status(501).json({ msg: error.message })
+        res.status(400)
+        throw new Error(error.message)
     }
 })
 
