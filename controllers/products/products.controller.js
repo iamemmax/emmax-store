@@ -243,11 +243,12 @@ exports.reviewProduct = ((0, express_async_handler_1.default)((req, res) => __aw
             //      
             if (savedProduct) {
                 // const update = await productModel.findOneAndUpdate({ productId }, { $set: { rating: products.productReviews.reduce((acc, item) => item.review + acc, 0) / savedProduct.productReviews.length } }, { new: true })
+                const { productReviews } = savedProduct;
                 res.status(200).json({
                     res: "ok",
                     msg: "product review successfully",
-                    products: savedProduct,
-                    reviewproduct: savedProduct === null || savedProduct === void 0 ? void 0 : savedProduct.productReviews
+                    // products: savedProduct,
+                    productReviews
                 });
             }
             else {
