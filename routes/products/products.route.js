@@ -17,12 +17,12 @@ router.put("/slider/update/:productId", ensureLogin_1.isAuthenticated, ensureLog
 router.delete("/slider/delete/:productId", ensureLogin_1.isAuthenticated, ensureLogin_1.isAdmin, sliders_controller_1.deleteProductSlide);
 // products
 router.get("/", ensureLogin_1.isAuthenticated, products_controller_1.getProductList);
-router.get("/:slug", ensureLogin_1.isAuthenticated, products_controller_1.getSingleProduct);
 router.post("/create", ensureLogin_1.isAuthenticated, (0, validate_1.validateSchema)(product_category_joi_1.validateProduct), products_controller_1.createProduct);
 router.get("/topselling", ensureLogin_1.isAuthenticated, products_controller_1.getTopSellingProduct);
+router.get("/:slug", ensureLogin_1.isAuthenticated, products_controller_1.getSingleProduct);
 router.get("/:category", ensureLogin_1.isAuthenticated, products_controller_1.getProductByCategory);
 router.delete("/:productId", ensureLogin_1.isAuthenticated, products_controller_1.deleteProduct);
-router.get("/:slug/:category", ensureLogin_1.isAuthenticated, products_controller_1.getRelatedProduct);
 router.put("/update/:productId", ensureLogin_1.isAuthenticated, products_controller_1.updateProduct);
 router.put("/review/:productId", ensureLogin_1.isAuthenticated, (0, validate_1.validateSchema)(product_category_joi_1.validateReviewProduct), products_controller_1.reviewProduct);
+router.get("/:slug/:category", ensureLogin_1.isAuthenticated, products_controller_1.getRelatedProduct);
 exports.default = router;

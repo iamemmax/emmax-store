@@ -14,14 +14,14 @@ router.delete("/slider/delete/:productId", isAuthenticated, isAdmin, deleteProdu
 
 // products
 router.get("/", isAuthenticated, getProductList)
-router.get("/:slug", isAuthenticated, getSingleProduct)
 router.post("/create", isAuthenticated, validateSchema(validateProduct), createProduct)
 router.get("/topselling", isAuthenticated, getTopSellingProduct)
+router.get("/:slug", isAuthenticated, getSingleProduct)
 router.get("/:category", isAuthenticated, getProductByCategory)
 router.delete("/:productId", isAuthenticated, deleteProduct)
-router.get("/:slug/:category", isAuthenticated, getRelatedProduct)
 router.put("/update/:productId", isAuthenticated, updateProduct)
 router.put("/review/:productId", isAuthenticated, validateSchema(validateReviewProduct), reviewProduct)
+router.get("/:slug/:category", isAuthenticated, getRelatedProduct)
 
 
 
