@@ -249,14 +249,16 @@ export const reviewProduct = (AsyncHandler(async (req: Request<{ productId: stri
             const savedProduct = await products.save()
             //      
             if (savedProduct) {
-                // const update = await productModel.findOneAndUpdate({ productId }, { $set: { rating: products.productReviews.reduce((acc, item) => item.review + acc, 0) / savedProduct.productReviews.length } }, { new: true })
+
                 const { productReviews } = savedProduct
+                const review = productReviews.filter((x: productReviewProps) => x?.userId.toString() === userId.toString())
+
                 res.status(200).json({
                     res: "ok",
                     msg: "product review successfully",
-                    // products: savedProduct,
-                    productReviews
+                    review
                 })
+                // }
             } else {
                 res.status(401)
                 throw new Error("unable to review product")

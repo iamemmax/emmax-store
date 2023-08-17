@@ -242,14 +242,14 @@ exports.reviewProduct = ((0, express_async_handler_1.default)((req, res) => __aw
             const savedProduct = yield products.save();
             //      
             if (savedProduct) {
-                // const update = await productModel.findOneAndUpdate({ productId }, { $set: { rating: products.productReviews.reduce((acc, item) => item.review + acc, 0) / savedProduct.productReviews.length } }, { new: true })
                 const { productReviews } = savedProduct;
+                const review = productReviews.filter((x) => (x === null || x === void 0 ? void 0 : x.userId.toString()) === userId.toString());
                 res.status(200).json({
                     res: "ok",
                     msg: "product review successfully",
-                    // products: savedProduct,
-                    productReviews
+                    review
                 });
+                // }
             }
             else {
                 res.status(401);
