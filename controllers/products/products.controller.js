@@ -220,7 +220,7 @@ exports.updateProduct = (0, express_async_handler_1.default)((req, res) => __awa
 // @DESC: review product
 //@METHOD:PUT
 //@ROUTES:localhost:3001/api/products/update/:productId
-const reviewProduct = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+exports.reviewProduct = ((0, express_async_handler_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     var _a, _b;
     let { productId } = req.params;
     const { userId, comment, review } = req.body;
@@ -230,10 +230,8 @@ const reviewProduct = (req, res) => __awaiter(void 0, void 0, void 0, function* 
         if (products) {
             const alreadyReviewed = products.productReviews.find((product) => product.userId.toString() === userId.toString());
             if (alreadyReviewed) {
-                return res.status(403).json({
-                    res: "fail",
-                    msg: "Product already reviewed"
-                });
+                res.status(401);
+                throw new Error("Product already reviewed");
             }
             const data = yield products.productReviews.reduce((acc, item) => item.review + acc, 0);
             const length = ((_a = products === null || products === void 0 ? void 0 : products.productReviews) === null || _a === void 0 ? void 0 : _a.length) + 1;
@@ -245,22 +243,21 @@ const reviewProduct = (req, res) => __awaiter(void 0, void 0, void 0, function* 
             //      
             if (savedProduct) {
                 // const update = await productModel.findOneAndUpdate({ productId }, { $set: { rating: products.productReviews.reduce((acc, item) => item.review + acc, 0) / savedProduct.productReviews.length } }, { new: true })
-                return res.status(200).json({
+                res.status(200).json({
                     res: "ok",
                     msg: "product review successfully",
-                    products: savedProduct
+                    products: savedProduct,
+                    reviewproduct: savedProduct === null || savedProduct === void 0 ? void 0 : savedProduct.productReviews
                 });
             }
             else {
-                return res.status(401).json({
-                    res: "fail",
-                    msg: "unable to  review product"
-                });
+                res.status(401);
+                throw new Error("unable to review product");
             }
         }
     }
     catch (error) {
-        return res.status(501).json({ msg: error.message });
+        res.status(401);
+        throw new Error(error.message);
     }
-});
-exports.reviewProduct = reviewProduct;
+})));

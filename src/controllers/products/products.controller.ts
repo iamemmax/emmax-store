@@ -225,7 +225,7 @@ export const updateProduct = AsyncHandler(async (req: Request<{ productId: strin
 //@METHOD:PUT
 //@ROUTES:localhost:3001/api/products/update/:productId
 
-export const reviewProduct = async (req: Request<{ productId: string }, {}, productReviewProps>, res: Response) => {
+export const reviewProduct = (AsyncHandler(async (req: Request<{ productId: string }, {}, productReviewProps>, res: Response) => {
     let { productId } = req.params
 
 
@@ -236,10 +236,8 @@ export const reviewProduct = async (req: Request<{ productId: string }, {}, prod
         if (products) {
             const alreadyReviewed = products.productReviews.find((product: productReviewProps) => product.userId.toString() === userId.toString())
             if (alreadyReviewed) {
-                return res.status(403).json({
-                    res: "fail",
-                    msg: "Product already reviewed"
-                })
+                res.status(401)
+                throw new Error("Product already reviewed")
             }
             const data = await products.productReviews.reduce((acc, item) => item.review + acc, 0)
             const length = products?.productReviews?.length + 1
@@ -252,20 +250,20 @@ export const reviewProduct = async (req: Request<{ productId: string }, {}, prod
             //      
             if (savedProduct) {
                 // const update = await productModel.findOneAndUpdate({ productId }, { $set: { rating: products.productReviews.reduce((acc, item) => item.review + acc, 0) / savedProduct.productReviews.length } }, { new: true })
-                return res.status(200).json({
+                res.status(200).json({
                     res: "ok",
                     msg: "product review successfully",
-                    products: savedProduct
+                    products: savedProduct,
+                    reviewproduct: savedProduct?.productReviews
                 })
             } else {
-                return res.status(401).json({
-                    res: "fail",
-                    msg: "unable to  review product"
-                })
+                res.status(401)
+                throw new Error("unable to review product")
             }
         }
 
     } catch (error: any) {
-        return res.status(501).json({ msg: error.message })
+        res.status(401)
+        throw new Error(error.message)
     }
-}
+}))
