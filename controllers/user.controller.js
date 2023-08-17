@@ -170,11 +170,11 @@ exports.loginUser = (0, express_async_handler_1.default)((req, res) => __awaiter
             }
             console.log(bcrypt_1.compare);
             if (compared) {
-                const { userId, email, firstname, roles, username, lastname, createdAt, verified } = userExist;
+                const { userId, email, firstname, roles, username, lastname, createdAt, verified, _id } = userExist;
                 const token = yield (0, generateToken_1.default)(res, userExist._id);
                 res.status(201).send({
                     user: {
-                        userId, email, firstname, username, lastname, roles, verified, createdAt,
+                        _id, userId, email, firstname, username, lastname, roles, verified, createdAt,
                     },
                     msg: "Authentication successful"
                 });

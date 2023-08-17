@@ -168,11 +168,11 @@ export const loginUser = AsyncHandler(async (req: Request<{}, {}, authenticateUs
             console.log(compare);
 
             if (compared) {
-                const { userId, email, firstname, roles, username, lastname, createdAt, verified } = userExist
+                const { userId, email, firstname, roles, username, lastname, createdAt, verified, _id } = userExist
                 const token = await generateToken(res, userExist._id)
                 res.status(201).send({
                     user: {
-                        userId, email, firstname, username, lastname, roles, verified, createdAt,
+                        _id, userId, email, firstname, username, lastname, roles, verified, createdAt,
                     },
                     msg: "Authentication successful"
                 })
