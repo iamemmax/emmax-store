@@ -240,10 +240,10 @@ exports.reviewProduct = ((0, express_async_handler_1.default)((req, res) => __aw
             products.numReview = (_b = products === null || products === void 0 ? void 0 : products.productReviews) === null || _b === void 0 ? void 0 : _b.length;
             products.rating = result;
             const savedProduct = yield products.save();
-            //      
-            if (savedProduct) {
-                const { productReviews } = savedProduct;
-                const review = productReviews.filter((x) => (x === null || x === void 0 ? void 0 : x.userId.toString()) === userId.toString());
+            const populateProduct = yield products_model_1.default.populate(savedProduct, { path: "productReviews.userId", select: "-password -token -verified -roles -__v" });
+            if (populateProduct) {
+                const { productReviews } = populateProduct;
+                const review = productReviews.filter((x) => (x === null || x === void 0 ? void 0 : x.userId._id.toString()) === userId.toString());
                 res.status(200).json({
                     res: "ok",
                     msg: "product review successfully",

@@ -227,8 +227,6 @@ export const updateProduct = AsyncHandler(async (req: Request<{ productId: strin
 
 export const reviewProduct = (AsyncHandler(async (req: Request<{ productId: string }, {}, productReviewProps>, res: Response) => {
     let { productId } = req.params
-
-
     const { userId, comment, review } = req.body
     const reviewItem = { userId, comment, review, reviewDate: new Date(Date.now()) }
     try {
@@ -247,11 +245,13 @@ export const reviewProduct = (AsyncHandler(async (req: Request<{ productId: stri
             products.numReview = products?.productReviews?.length
             products.rating = result
             const savedProduct = await products.save()
-            //      
-            if (savedProduct) {
 
-                const { productReviews } = savedProduct
-                const review = productReviews.filter((x: productReviewProps) => x?.userId.toString() === userId.toString())
+            const populateProduct = await productModel.populate(savedProduct, { path: "productReviews.userId", select: "-password -token -verified -roles -__v" })
+
+            if (populateProduct) {
+
+                const { productReviews } = populateProduct
+                const review = productReviews.filter((x: productReviewProps) => x?.userId._id.toString() === userId.toString())
 
                 res.status(200).json({
                     res: "ok",
